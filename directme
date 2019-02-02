@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # mapIt.py - Launches a map in the browser using an address from the command line or clipboard
-import webbrowser, argparse, pyperclip
+import webbrowser, argparse, pyperclip, os
+
+# TODO add option for saving favorites and home to new file
 
 # Home address
 home = ''
@@ -11,14 +13,33 @@ parser = argparse.ArgumentParser(description='Open directions directly in browse
 
 # Args
 parser.add_argument('-s', '--source', action='store', dest='source', nargs='+',
-                    help='Source address')
-parser.add_argument('-d', '--destination', action='store', dest='destination',
+                    help='Source address', default=home)
+
+# Create group
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-d', '--destination', action='store', dest='destination',
                     nargs='+', help='Destination address', default=pyperclip.paste())
+group.add_argument('--set-home', action='store', dest='home', nargs='+', help='Save new home address')
+
 parser.add_argument('--version', action='version', version='%(prog)s 0.1.0')
 
 # Parse and get args
 args = parser.parse_args()
 
-# Open google maps directions in browser with source and destination
-webbrowser.open('https://www.google.com/maps/dir/' + ' '.join(args.source) + '/' + ' '.join(args.destination) + '/')
+if args.home:
+    with open('directme', 'r') as this_file:
+        # read lines into data
+        data = this_file.readlines()  
+    
+    # Edit home 
+    for line in data:
+        if 'home' in line:
+            line = 'home = \'' + ' '.join(args.home) + '\'\n'
+            break
+
+    with open('directme', 'w') as this_file:
+        this_file.writelines( data )
+else:
+    # Open google maps directions in browser with source and destination
+    webbrowser.open('https://www.google.com/maps/dir/' + ' '.join(args.source) + '/' + ' '.join(args.destination) + '/')
 
