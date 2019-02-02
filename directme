@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# mapIt.py - Launches a map in the browser using an address from the command line or clipboard
+import webbrowser, argparse, pyperclip
+
+# Home address
+home = ''
+
+# Arg parsing
+# Description
+parser = argparse.ArgumentParser(description='Open directions directly in browser.')
+
+# Args
+parser.add_argument('-s', '--source', action='store', dest='source', nargs='+',
+                    help='Source address')
+parser.add_argument('-d', '--destination', action='store', dest='destination',
+                    nargs='+', help='Destination address', default=pyperclip.paste())
+parser.add_argument('--version', action='version', version='%(prog)s 0.1.0')
+
+# Parse and get args
+args = parser.parse_args()
+
+# Open google maps directions in browser with source and destination
+webbrowser.open('https://www.google.com/maps/dir/' + ' '.join(args.source) + '/' + ' '.join(args.destination) + '/')
+
